@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Chain Multiplication</title>
+</head>
+<style>
+    body {
+    
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-image: url(https://miro.medium.com/v2/resize:fit:852/0*16mClm2NzNfFdWzY.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+h1 {
+    text-align: center;
+    font-size: 3em;
+    color: rgb(141, 192, 156);
+}
+
+p {
+    font-size: 1.5em;
+    text-align: center;
+    color: rgb(131, 162, 122);
+}
+
+.main {
+    text-align: center;
+    background-color: rgba(54, 62, 69, 0.45);
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Center-align text box and button */
+.center-align {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Style the button */
+button {
+    padding: 5px 10px;
+    background-color: #01a101;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 40px;
+    padding: 10px;
+    width: 200px; /* Add margin for spacing */
+}
+
+#inputField {
+    width: 300px;
+    height: 40px;
+    border-radius: 50px;
+    padding-left: 10px;
+    font-size: 2em;
+}
+
+/* Style the form elements */
+form {
+    text-align: center;
+    margin-top: 20px;
+}
+
+label {
+    font-size: 1.5em;
+    color: aliceblue;
+}
+
+input[type="number"] {
+    width: 100px;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+input[type="submit"] {
+    padding: 10px 20px;
+    background-color: #55ff00;
+    color: rgb(18, 14, 14);
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+    border-radius: 40px;
+    font-size: 1.5em;
+}
+.main{
+    text-align: center;
+        background-color: rgba(54, 62, 69, 0.45);
+            background-size: 100% 100%;
+            display: flex;
+            flex-direction: column ;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+}
+
+</style>
+
+<div class="main"><h1>Matrix Chain Multiplication</h1>
+
+    <form id="matrixForm">
+        <label for="numMatrices">Enter the number of matrices:</label>
+        <input type="number" id="numMatrices" name="numMatrices" required><br><br>
+
+        <div id="matrixInputs"></div>
+
+        <input type="submit" value="Calculate">
+    </form>
+
+    <div id="result"></div>
+</div>
+    <script>
+        function matrixChainMultiplication(matrices) {
+            const n = matrices.length;
+
+            for (let i = 1; i < n; i++) {
+                if (matrices[i - 1][1] !== matrices[i][0]) {
+                    throw new Error("Matrix dimensions are not compatible for multiplication.");
+                }
+            }
+
+            const minScalarMultiplications = new Array(n).fill().map(() => new Array(n).fill(0));
+            const splitPositions = new Array(n).fill().map(() => new Array(n).fill(0));
+
+            for (let i = 0; i < n; i++) {
+                minScalarMultiplications[i][i] = 0;
+            }
+
+            for (let l = 2; l <= n; l++) {
+                for (let i = 0; i < n - l + 1; i++) {
+                    const j = i + l - 1;
+                    minScalarMultiplications[i][j] = Infinity;
+
+                    for (let k = i; k < j; k++) {
+                        const cost =
+                            minScalarMultiplications[i][k] +
+                            minScalarMultiplications[k + 1][j] +
+                            matrices[i][0] * matrices[k][1] * matrices[j][1];
+
+                        if (cost < minScalarMultiplications[i][j]) {
+                            minScalarMultiplications[i][j] = cost;
+                            splitPositions[i][j] = k;
+                        }
+                    }
+                }
+            }
+
+            function constructParenthesization(i, j) {
+                if (i === j) {
+                    return `M${i}`;
+                } else {
+                    const k = splitPositions[i][j];
+                    const left = constructParenthesization(i, k);
+                    const right = constructParenthesization(k + 1, j);
+                    return `(${left} * ${right})`;
+                }
+            }
+
+            const optimalParenthesization = constructParenthesization(0, n - 1);
+            const minimumScalarMultiplications = minScalarMultiplications[0][n - 1];
+
+            return [optimalParenthesization, minimumScalarMultiplications];
+        }
+
+        document.getElementById("matrixForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const numMatrices = parseInt(document.getElementById("numMatrices").value);
+            const matrices = [];
+
+            for (let i = 0; i < numMatrices; i++) {
+                const rows = parseInt(document.getElementById(`matrix${i + 1}Rows`).value);
+                const cols = parseInt(document.getElementById(`matrix${i + 1}Cols`).value);
+                matrices.push([rows, cols]);
+            }
+
+            try {
+                const [optimalParenthesization, minScalarMultiplications] = matrixChainMultiplication(matrices);
+
+                const resultDiv = document.createElement("div");
+                resultDiv.innerHTML = `<p>Optimal Parenthesization: ${optimalParenthesization}</p><p>Minimum Scalar Multiplications: ${minScalarMultiplications}</p>`;
+                document.getElementById("result").innerHTML = "";
+                document.getElementById("result").appendChild(resultDiv);
+            } catch (e) {
+                const errorDiv = document.createElement("div");
+                errorDiv.innerHTML = `<p>Error: ${e.message}</p>`;
+                document.getElementById("result").innerHTML = "";
+                document.getElementById("result").appendChild(errorDiv);
+            }
+        });
+
+        document.getElementById("numMatrices").addEventListener("input", function () {
+            const numMatrices = parseInt(document.getElementById("numMatrices").value);
+            const matrixInputsDiv = document.getElementById("matrixInputs");
+            matrixInputsDiv.innerHTML = "";
+
+            for (let i = 0; i < numMatrices; i++) {
+                const matrixInput = `
+                    <label for="matrix${i + 1}Rows">Matrix ${i + 1} Dimensions (rows cols):</label>
+                    <input type="number" id="matrix${i + 1}Rows" name="matrix${i + 1}Rows" required>
+                    <input type="number" id="matrix${i + 1}Cols" name="matrix${i + 1}Cols" required><br><br>
+                `;
+                matrixInputsDiv.innerHTML += matrixInput;
+            }
+        });
+    </script>
+</body>
+</html>

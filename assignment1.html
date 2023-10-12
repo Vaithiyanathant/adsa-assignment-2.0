@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Randomized and Sorted Numbers</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            background-image: url('https://mosew.com/wp-content/uploads/2023/08/desktop-wallpaper-full-dark-black-screen-black-page.jpg'); /* Replace 'your-background-image-url.jpg' with the actual image URL */
+            background-size: cover;
+            background-color:black;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #0d43b6;
+        }
+
+        p {
+            font-size: 1.5em;
+            text-align: center;
+            color: white;
+        }
+
+        .main {
+            text-align: center;
+            display: flex;
+            flex-direction: column ;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Center-align text box and button */
+        .center-align {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Style the button */
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 40px;
+            padding: 10px;
+            width: 200px;
+        }
+        #inputField{
+            width: 300px;
+            height: 40px;
+            border-radius: 50px;
+            padding-left: 10px;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <h1>Randomized and Sorted Numbers</h1>
+        <p>Enter the number of random numbers to generate:</p>
+        <div class="center-align">
+            <input type="number" id="inputField" min="1">
+            <button onclick="generateAndSort()">Generate & Sort</button>
+        </div>
+        <p>Unsorted Array:</p>
+        <p id="unsortedArray"></p>
+        <p>Sorted Array:</p>
+        <p id="sortedArray"></p>
+    </div>
+    <script>
+        function generateRandomNumbers(n) {
+            const randomArray = [];
+
+            for (let i = 0; i < n; i++) {
+                randomArray.push(Math.floor(Math.random() * 100)); // Generate random numbers between 0 and 99
+            }
+
+            return randomArray;
+        }
+
+        function bubbleSort(arr) {
+            const n = arr.length;
+
+            for (let i = 0; i < n; i++) {
+                let swapped = false;
+
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        swapped = true;
+                    }
+                }
+
+                if (!swapped) {
+                    break;
+                }
+            }
+
+            return arr;
+        }
+
+        function generateAndSort() {
+            const n = parseInt(document.getElementById("inputField").value, 10);
+
+            if (isNaN(n) || n < 1) {
+                alert("Please enter a valid positive number.");
+                return;
+            }
+
+            const unsortedArray = generateRandomNumbers(n);
+            const sortedArray = bubbleSort([...unsortedArray]);
+
+            document.getElementById("unsortedArray").textContent = "Unsorted Array: " + unsortedArray.join(', ');
+            document.getElementById("sortedArray").textContent = "Sorted Array: " + sortedArray.join(', ');
+        }
+    </script>
+</body>
+</html>

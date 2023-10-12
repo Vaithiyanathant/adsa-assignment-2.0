@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>N-Queens Solver</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            background: url('https://img.freepik.com/premium-photo/gold-king-chess-surrounded-by-number-fallen-silver-chess-pieces-business-strategy-concept_35570-629.jpg') center center fixed;
+            background-size: cover;
+        }
+
+        .main {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: aliceblue;
+        }
+
+        div {
+            margin: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: aliceblue;
+        }
+
+        input {
+            width: 50px;
+            padding: 5px;
+        }
+
+        #solutions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            backdrop-filter: blur(100px);
+
+        }
+
+        .solution {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+        }
+
+        .board-row {
+            display: flex;
+            justify-content: center;
+        }
+
+        .board-cell {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 20px;
+            border: 1px solid #ccc;
+        }
+
+
+        .empty-white {
+            background-color: white;
+            color: black;
+        }
+
+        .empty-black {
+            background-color: black;
+            color: white;
+        }
+
+        .empty {
+            color: black;
+        }
+
+        .center-align {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .btn-12,
+.btn-12 *,
+.btn-12 :after,
+.btn-12 :before,
+.btn-12:after,
+.btn-12:before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+
+.btn-12 {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: button;
+  background-color: #000;
+  background-image: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-size: 100%;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.btn-12:disabled {
+  cursor: default;
+}
+
+.btn-12:-moz-focusring {
+  outline: auto;
+}
+
+.btn-12 svg {
+  display: block;
+  vertical-align: middle;
+}
+
+.btn-12 [hidden] {
+  display: none;
+}
+
+.btn-12 {
+  border-radius: 99rem;
+  border-width: 2px;
+  overflow: hidden;
+  padding: 0.8rem 3rem;
+  position: relative;
+}
+
+.btn-12 span {
+  mix-blend-mode: difference;
+}
+
+.btn-12:after,
+.btn-12:before {
+  background: linear-gradient(
+    90deg,
+    #fff 25%,
+    transparent 0,
+    transparent 50%,
+    #fff 0,
+    #fff 75%,
+    transparent 0
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateY(var(--progress, 100%));
+  transition: transform 0.2s ease;
+}
+
+.btn-12:after {
+  --progress: -100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 25%,
+    #fff 0,
+    #fff 50%,
+    transparent 0,
+    transparent 75%,
+    #fff 0
+  );
+  z-index: -1;
+}
+
+.btn-12:hover:after,
+.btn-12:hover:before {
+  --progress: 0;
+}
+
+input
+{
+    margin-bottom:30px;
+    font-family:'Times New Roman', Times, serif;
+    border-radius:20px
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <h1>N-Queens Solver</h1>
+        <div>
+            <label for="board-size">Enter Board Size (N X N):</label>
+            <div class="center-align">
+                <input type="number" id="board-size" min="4" value="8">
+                <button class="btn-12" onclick="solveNQueens()"><span>Solve</span></button>
+
+            </div>
+        </div>
+        <div id="solutions"></div>
+
+        <script>
+            function isSafe(board, row, col, n) {
+                for (let i = 0; i < col; i++) {
+                    if (board[row][i] === 1) return false;
+                }
+                for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+                    if (board[i][j] === 1) return false;
+                }
+                for (let i = row, j = col; i < n && j >= 0; i++, j--) {
+                    if (board[i][j] === 1) return false;
+                }
+                return true;
+            }
+
+            function solveNQueens() {
+                const n = parseInt(document.getElementById("board-size").value);
+                const solutionsContainer = document.getElementById("solutions");
+                solutionsContainer.innerHTML = '';
+
+                const board = Array.from({ length: n }, () => Array(n).fill(0));
+
+                function solve(col) {
+                    if (col === n) {
+                        const solutionDiv = document.createElement("div");
+                        solutionDiv.classList.add("solution");
+                        const boardDiv = document.createElement("div");
+
+                        for (let i = 0; i < n; i++) {
+                            const rowDiv = document.createElement("div");
+                            rowDiv.classList.add("board-row");
+                            for (let j = 0; j < n; j++) {
+                                const cellDiv = document.createElement("div");
+                                cellDiv.classList.add("board-cell");
+                                if ((i + j) % 2 === 0) {
+                                    cellDiv.classList.add("empty-white");
+                                } else {
+                                    cellDiv.classList.add("empty-black");
+                                }
+                                if (board[i][j] === 1) {
+                                    cellDiv.textContent = "♛";
+                                    cellDiv.classList.add("queen");
+                                }
+                                rowDiv.appendChild(cellDiv);
+                            }
+                            boardDiv.appendChild(rowDiv);
+                        }
+
+                        solutionDiv.appendChild(boardDiv);
+                        solutionsContainer.appendChild(solutionDiv);
+                        return;
+                    }
+
+                    for (let i = 0; i < n; i++) {
+                        if (isSafe(board, i, col, n)) {
+                            board[i][col] = 1;
+                            solve(col + 1);
+                            board[i][col] = 0;
+                        }
+                    }
+                }
+
+                solve(0);
+            }
+        </script>
+    </div>
+</body>
+
+</html>
